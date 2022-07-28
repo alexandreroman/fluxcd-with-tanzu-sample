@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: metallb-values
+  namespace: metallb-system
+type: Opaque
+stringData:
+  values.yaml: |
+    configInline:
+      address-pools:
+      - name: default
+        protocol: layer2
+        addresses:
+        - 10.220.6.134-10.220.6.134

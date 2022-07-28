@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spring-on-k8s
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: spring-on-k8s
+  namespace: spring-on-k8s
+spec:
+  interval: 30s
+  path: ./k8s
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: spring-on-k8s
+  targetNamespace: spring-on-k8s
+  patches:
+  #! Customize the Service object by setting the service type to ClusterIP
+  #! instead of LoadBalancer.
+  - patch: |
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: app
+      spec:
+        type: ClusterIP
+        ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 8080
+        selector:
+          role: app
+    target:
+      kind: Service
+      name: app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: spring-on-k8s
+spec:
+ rules:
+  - host: springonk8s.corp.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: app
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress
+  namespace: spring-on-k8s
+spec:
+  podSelector:
+    matchLabels:
+      role: app
+  ingress:
+  - ports:
+    - port: 8080
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: spring-on-k8s
+  namespace: spring-on-k8s
+spec:
+  interval: 1m
+  url: https://github.com/alexandreroman/spring-on-k8s.git
+  ref:
+    branch: master
+  secretRef:
+    name: git-secret
+---
+#! Import the Git secret in this namespace.
+apiVersion: secretgen.carvel.dev/v1alpha1
+kind: SecretImport
+metadata:
+  name: git-secret
+  namespace: spring-on-k8s
+spec:
+  fromNamespace: gitops

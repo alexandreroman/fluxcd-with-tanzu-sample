@@ -1,0 +1,5 @@
+resources:
+- cert-manager.yaml
+- contour.yaml
+- metallb.yaml
+- kyverno.yaml

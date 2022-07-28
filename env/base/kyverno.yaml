@@ -1,0 +1,49 @@
+#! Install Kyverno using an Helm chart.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kyverno
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  targetNamespace: kyverno
+  interval: 30s
+  chart:
+    spec:
+      chart: kyverno
+      version: 2.5.2
+      sourceRef:
+        kind: HelmRepository
+        name: kyverno
+  valuesFrom:
+  - kind: Secret
+    name: kyverno-values
+    optional: true
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  interval: 5m
+  url: https://kyverno.github.io/kyverno/
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: kyverno-policies
+  namespace: gitops
+spec:
+  serviceAccountName: gitops-sa
+  interval: 30s
+  path: ./policies/kyverno
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: clusters

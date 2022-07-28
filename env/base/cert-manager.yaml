@@ -1,0 +1,25 @@
+#! Install the cert-manager package.
+
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: cert-manager
+  namespace: gitops
+spec:
+  packageRef:
+    refName: cert-manager.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.5.3+vmware.2-tkg.1
+  serviceAccountName: gitops-sa
+  values:
+  - secretRef:
+      name: cert-manager-values
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cert-manager-values
+  namespace: gitops
+type: Opaque
+stringData:
+  values.yaml:

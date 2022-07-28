@@ -1,0 +1,3 @@
+resources:
+- kyverno-ns-deny-all.yaml
+- kyverno-ns-quota.yaml

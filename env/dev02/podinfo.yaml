@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: podinfo-values
+  namespace: podinfo
+type: Opaque
+stringData:
+  values.yaml: |
+    replicaCount: 3
+    ingress:
+      enabled: true
+      hosts:
+      - host: podinfo.10.220.6.134.nip.io
+        paths:
+        - path: /
+          pathType: ImplementationSpecific

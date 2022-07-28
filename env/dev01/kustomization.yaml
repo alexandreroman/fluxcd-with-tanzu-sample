@@ -1,0 +1,6 @@
+resources:
+- ../base-dev
+- metallb.yaml
+patchesStrategicMerge:
+- podinfo.yaml
+- spring-on-k8s.yaml

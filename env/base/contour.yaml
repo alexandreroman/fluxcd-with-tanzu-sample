@@ -1,0 +1,29 @@
+#! Install the Contour package with a default configuration.
+
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: contour
+  namespace: gitops
+spec:
+  packageRef:
+    refName: contour.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.18.2+vmware.1-tkg.1
+  serviceAccountName: gitops-sa
+  values:
+  - secretRef:
+      name: contour-values
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: contour-values
+  namespace: gitops
+stringData:
+  values.yaml: |
+    contour:
+      replicas: 1
+    envoy:
+      service:
+        type: LoadBalancer
