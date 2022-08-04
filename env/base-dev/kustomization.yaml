@@ -1,4 +1,3 @@
 resources:
 - ../base
 - ../../apps/podinfo
-- ../../apps/spring-on-k8s
